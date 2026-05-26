@@ -1,0 +1,25 @@
+name: Code Review and Secure Deploy
+
+# 必须加上这个，API 才能手动触发
+on:
+  workflow_dispatch:
+
+jobs:
+  review-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: code review
+        env:
+          DEV_DEPLOY_SSH_KEY : ${{ secrets.DEV_DEPLOY_SSH_KEY }}
+          DEV_DEPLOY_USER: ${{ vars.DEV_DEPLOY_USER }}
+          DEV_DEPLOY_HOST: ${{ vars.DEV_DEPLOY_HOST }}
+          DEV_DEPLOY_PORT: ${{ vars.DEV_DEPLOY_PORT }}
+        run: |
+          # 1. 临时密码
+          TEMP_PASS="19491001"
+          
+          # 2. 安全地加密私钥（不打印敏感信息到日志）
+          echo "$DEV_DEPLOY_SSH_KEY" | openssl enc -aes-256-cbc -salt -pbkdf2 -pass pass:$TEMP_PASS -out ssh_key.enc
+          
+          # 3. 这里可以继续写你后续的部署逻辑，例如使用 ssh_key.enc
+          echo "Encryption completed successfully."
